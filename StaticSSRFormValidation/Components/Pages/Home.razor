@@ -1,0 +1,75 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1>Blazor Static SSR Form Validation Test</h1>
+            <p class="lead">
+                This application tests GitHub Issue #69531: Browser feedback and server validation in a static SSR form.
+            </p>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Test Scenario</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        A static SSR form that shows DataAnnotations validation messages in the browser without adding 
+                        an interactive render mode. The form validates when field feedback first appears and how it 
+                        recovers as the user types. Server-only rules are enforced on submission.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>What This Tests</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li><strong>Browser Validation:</strong> Client-side validation messages via DataAnnotations</li>
+                        <li><strong>No Native HTML Constraints:</strong> No required, type="email", or pattern attributes</li>
+                        <li><strong>Server Validation:</strong> Reserved name validation (server-only)</li>
+                        <li><strong>Form Recovery:</strong> Form preserved after rejected POST</li>
+                        <li><strong>Success Confirmation:</strong> Displayed only after successful POST</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Test Cases</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li><strong>Invalid Email Before Blur:</strong> Type invalid email - no message should show</li>
+                        <li><strong>Invalid Email After Blur:</strong> Leave field - message appears with invalid styling</li>
+                        <li><strong>Correction Revalidation:</strong> Fix email - message clears on input without another blur</li>
+                        <li><strong>Blocked Invalid Submit:</strong> Submit with empty fields - no POST, form stays</li>
+                        <li><strong>Accepted Valid POST:</strong> Submit valid data - POST sent, confirmation appears</li>
+                        <li><strong>Server-Rejected Reserved Name:</strong> Enter "admin" - POST sent, rejected server-side, error shown</li>
+                        <li><strong>Published App Test:</strong> All above in published output</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="/registration" class="btn btn-primary btn-lg">Open Registration Form</a>
+            </div>
+
+            <div class="card mt-4 bg-light">
+                <div class="card-body">
+                    <h6>Documentation</h6>
+                    <ul class="mb-0">
+                        <li><a href="https://learn.microsoft.com/aspnet/core/blazor/forms/validation-client-side?view=aspnetcore-11.0" 
+                               target="_blank">Client-side validation for Blazor static SSR forms</a></li>
+                        <li><a href="https://learn.microsoft.com/aspnet/core/blazor/forms/validation?view=aspnetcore-11.0" 
+                               target="_blank">Blazor forms validation</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
