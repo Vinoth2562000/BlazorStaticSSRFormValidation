@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using StaticSSRFormValidation.Models;
 
 namespace StaticSSRFormValidation.Endpoints
@@ -17,13 +18,21 @@ namespace StaticSSRFormValidation.Endpoints
                 .Produces(400);
         }
 
-        private static IResult HandleRegistration(RegistrationModel model)
+        private static IResult HandleRegistration(HttpContext context, IFormCollection form)
         {
+            // Extract form data - Blazor posts with "Model." prefix when using FormName
+            var model = new RegistrationModel
+            {
+                Name = form["Model.Name"].ToString(),
+                Email = form["Model.Email"].ToString(),
+                Age = int.TryParse(form["Model.Age"].ToString(), out var age) ? age : 0
+            };
+
             // Validate model
-            var context = new ValidationContext(model);
+            var validationContext = new ValidationContext(model);
             var results = new List<ValidationResult>();
 
-            if (!Validator.TryValidateObject(model, context, results, true))
+            if (!Validator.TryValidateObject(model, validationContext, results, true))
             {
                 // Build error response from validation results
                 var errors = new Dictionary<string, string[]>();
@@ -40,14 +49,9 @@ namespace StaticSSRFormValidation.Endpoints
                 return Results.BadRequest(new { errors });
             }
 
-            // If all validations passed, return success
-            var response = new RegistrationResponse
-            {
-                Name = model.Name,
-                Timestamp = DateTime.UtcNow
-            };
+            // If all validations passed, redirect back to form with success message
+            return Results.Redirect($"/registration?success=true&name={Uri.EscapeDataString(model.Name ?? "")}");
 
-            return Results.Ok(response);
         }
 
         public class RegistrationResponse
