@@ -1,5 +1,4 @@
 using StaticSSRFormValidation.Components;
-using StaticSSRFormValidation.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +22,5 @@ app.UseHttpsRedirection();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-// Map registration endpoints
-app.MapRegistrationEndpoints();
 
 app.Run();

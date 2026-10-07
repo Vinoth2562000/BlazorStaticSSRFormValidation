@@ -81,6 +81,14 @@ h1:focus {
     margin-bottom: 0.25rem;
 }
 
+.server-validation-summary {
+    color: #e50000;
+}
+
+.validation-summary-card:has(.validation-summary-errors:not([hidden])) .server-validation-summary {
+    display: none;
+}
+
 /* Highlighted test checklist */
 .card-body ul li {
     margin-bottom: 0.5rem;

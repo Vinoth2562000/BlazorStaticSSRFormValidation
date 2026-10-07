@@ -1,5 +1,4 @@
 @page "/registration"
-@using System.ComponentModel.DataAnnotations
 @using StaticSSRFormValidation.Models
 
 <PageTitle>Registration Form - Validation Test</PageTitle>
@@ -22,7 +21,7 @@
                 </div>
             }
 
-            <EditForm Model="@Model" FormName="registrationForm" method="post" action="/api/register">
+            <EditForm Model="Model!" FormName="registrationForm" method="post" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
                 
                 <div class="card mb-4">
@@ -35,10 +34,10 @@
                             <label for="name" class="form-label">Name (required)</label>
                             <InputText 
                                 id="name" 
-                                @bind-Value="Model.Name" 
+                                @bind-Value="Model!.Name"
                                 class="form-control" 
                                 placeholder="Enter your name" />
-                            <ValidationMessage For="@(() => Model.Name)" class="invalid-feedback d-block" />
+                            <ValidationMessage For="@(() => Model!.Name)" class="invalid-feedback d-block" />
                             <small class="form-text text-muted">
                                 Note: "admin", "system", "root", "test", "administrator" are reserved names (server-only validation)
                             </small>
@@ -49,10 +48,10 @@
                             <label for="email" class="form-label">Email (required, must be valid)</label>
                             <InputText 
                                 id="email" 
-                                @bind-Value="Model.Email" 
+                                @bind-Value="Model!.Email"
                                 class="form-control" 
                                 placeholder="Enter your email" />
-                            <ValidationMessage For="@(() => Model.Email)" class="invalid-feedback d-block" />
+                            <ValidationMessage For="@(() => Model!.Email)" class="invalid-feedback d-block" />
                             <small class="form-text text-muted">
                                 Note: No native HTML constraints applied. Validation via DataAnnotations only.
                             </small>
@@ -63,10 +62,10 @@
                             <label for="age" class="form-label">Age (required, 18-120)</label>
                             <InputNumber 
                                 id="age" 
-                                @bind-Value="Model.Age" 
+                                @bind-Value="Model!.Age"
                                 class="form-control" 
                                 placeholder="Enter your age" />
-                            <ValidationMessage For="@(() => Model.Age)" class="invalid-feedback d-block" />
+                            <ValidationMessage For="@(() => Model!.Age)" class="invalid-feedback d-block" />
                         </div>
                     </div>
                 </div>
@@ -76,8 +75,10 @@
                     <div class="card-header bg-danger text-white">
                         <h5>Validation Errors</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body validation-summary-card">
                         <ValidationSummary />
+                        @* RC1 reconciles server-only errors into field-bound containers, so mirror Name in the summary card. *@
+                        <ValidationMessage For="@(() => Model!.Name)" class="server-validation-summary" />
                     </div>
                 </div>
 
@@ -93,26 +94,18 @@
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    public string? Success { get; set; }
+    [SupplyParameterFromForm(FormName = "registrationForm")]
+    private RegistrationModel? Model { get; set; }
 
-    [SupplyParameterFromQuery]
-    public string? Name { get; set; }
-
-    private RegistrationModel Model = new();
     private string? SuccessMessage { get; set; }
 
     protected override void OnInitialized()
     {
-        if (!string.IsNullOrEmpty(Success) && Success.Equals("true", StringComparison.OrdinalIgnoreCase))
-        {
-            SuccessMessage = $"Registration successful! Thank you, {Name}. Your registration has been submitted.";
-        }
+        Model ??= new();
     }
 
-    public class RegistrationResponse
+    private void HandleValidSubmit()
     {
-        public string? Name { get; set; }
-        public DateTime Timestamp { get; set; }
+        SuccessMessage = $"Registration successful! Thank you, {Model!.Name}. Your registration has been submitted.";
     }
 }

@@ -39,14 +39,18 @@ namespace StaticSSRFormValidation.Models
             "test"
         };
 
-        public override bool IsValid(object? value)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value is not string name || string.IsNullOrWhiteSpace(name))
             {
-                return true; // Let Required attribute handle this
+                return ValidationResult.Success;
             }
 
-            return !ReservedNames.Contains(name);
+            return ReservedNames.Contains(name)
+                ? new ValidationResult(
+                    FormatErrorMessage(validationContext.DisplayName),
+                    [validationContext.MemberName!])
+                : ValidationResult.Success;
         }
     }
 }
