@@ -7,17 +7,17 @@ browser feedback and server validation in a static SSR form on .NET 11 RC1.
 ## Current evidence status
 
 The application was corrected after review feedback identified that the previous
-API-style POST navigated to a raw HTTP 400 response. The recordings and published
-files currently under `Evidence/` predate the corrected implementation and must
-not be used as passing evidence.
+API-style POST navigated to a raw HTTP 400 response. The recordings were replaced
+for the corrected implementation, and the published files were regenerated from
+the clean test revision identified below.
 
 Before resubmitting the report:
 
-1. Commit the corrected source.
-2. Record the complete commit SHA.
-3. Build, publish, and run from that exact commit.
-4. Replace every recording with evidence captured from that revision.
-5. Update the report with the same full SHA and the environment details.
+1. Use test revision `a0a386f0e45203e857bec5f534e3080802d52368`.
+2. Build, publish, and run from a clean checkout of that exact revision.
+3. Use only recordings captured from that revision.
+4. Commit the regenerated published output and reproducibility logs.
+5. Ensure the report uses the same full SHA and environment details.
 
 Do not mark the overall or published-output outcome as `Works` until every
 mandatory path below passes in both development and published execution.
@@ -212,8 +212,8 @@ correction. Record the actual values again when capturing final evidence.
 | VS Code | 1.140.0, x64 |
 | Visual Studio | 18.10.3 |
 | Branch | `main` |
-| Source baseline before uncommitted correction | `68f52c217d36dc43ddfdea0fc38f3bed7f07c2d7` |
-| Corrected test commit | Pending: commit, then replace this text with the full SHA |
+| Previous failed baseline | `68f52c217d36dc43ddfdea0fc38f3bed7f07c2d7` |
+| Corrected test commit | `a0a386f0e45203e857bec5f534e3080802d52368` |
 
 ## Project layout
 
