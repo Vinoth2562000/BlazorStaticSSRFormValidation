@@ -1,0 +1,6 @@
+OS: Windows 11 build 26100
+Microsoft Edge: 154.0.4258.62
+VS Code: 1.140.0 (x64)
+Visual Studio: 18.10.3
+Git: git version 2.56.0.windows.1
+Execution modes: Development (Development environment, source build) and Published (Production environment, regenerated Release publish)

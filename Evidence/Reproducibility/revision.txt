@@ -1,0 +1,6 @@
+Test source revision:
+a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8
+
+git status --short (no output means clean):
+
+git branch --show-current (blank because detached exact-SHA checkout):
