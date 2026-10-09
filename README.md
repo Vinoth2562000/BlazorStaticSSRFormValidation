@@ -20,6 +20,27 @@ Before resubmitting the report:
 4. Commit the regenerated published output and reproducibility logs.
 5. Ensure the report uses the same full SHA and environment details.
 
+### Revision identity chain
+
+The tested application source revision is
+`a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`. The report, clean-checkout log,
+and published assembly `ProductVersion` must all identify that SHA.
+
+Later commits may add recordings, HAR files, logs, the Word report, and published
+artifacts to the repository. Those evidence-packaging commits become GitHub
+`HEAD`, but they aren't a different tested application revision. Reviewers
+should verify the chain as follows:
+
+1. `Evidence/Reproducibility/revision.txt` records a clean detached checkout of
+   the tested source revision.
+2. `Evidence/Reproducibility/restore-build-publish.log` records restore, Release
+   build, and publish from that checkout.
+3. `Evidence/Reproducibility/published-assembly.txt` records the published DLL's
+   `ProductVersion` and SHA-256 hash.
+4. The Word report names the same tested source revision.
+5. A later GitHub `HEAD` is expected only when its changes package evidence and
+   don't alter the tested application source.
+
 Do not mark the overall or published-output outcome as `Works` until every
 mandatory path below passes in both development and published execution.
 
