@@ -1,25 +1,27 @@
 # Blazor Static SSR Form Validation
 
-This repository validates the scenario in
+This repository reproduces and documents the scenario in
 [dotnet/aspnetcore#69531](https://github.com/dotnet/aspnetcore/issues/69531):
-browser feedback and server validation in a static SSR form on .NET 11 RC1.
+browser feedback and server-side validation in a static SSR form using .NET 11
+RC1.
 
 ## Current evidence status
 
-The application was corrected after review feedback identified that the previous
+The application was updated after review feedback showed that the previous
 API-style POST navigated to a raw HTTP 400 response. The published files and
-reproducibility logs were regenerated from the clean test revision identified
-below. Development and published reserved-name evidence now demonstrate an HTTP
-200 form response with all three submitted values preserved, field and summary
-errors, no success confirmation, and no raw JSON response.
+reproducibility logs were regenerated from the clean tested revision identified
+below. Development and published evidence for the reserved-name scenario now
+shows an HTTP 200 form response with all three submitted values preserved,
+field-level and summary errors, no success confirmation, and no raw JSON
+response.
 
 The report must not claim `Outcome: Works` until the remaining evidence gaps are
 closed:
 
-1. Capture development and published negative tests proving that direct
+1. Capture development and published negative tests showing that direct
    navigation to `/registration?success=true&name=Anything` shows no
    confirmation.
-2. Repeat every mandatory published path using output built from test revision
+2. Repeat every mandatory published path using output built from tested revision
    `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`.
 3. Label every recording as Development or Published and list the exact evidence
    filenames in the report.
@@ -27,7 +29,7 @@ closed:
 
 ### Revision identity chain
 
-The tested application source revision is
+The tested application revision is
 `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`. The report, clean-checkout log,
 and published assembly `ProductVersion` must all identify that SHA.
 
@@ -38,8 +40,8 @@ Reviewers should verify the chain as follows:
 
 1. `Evidence/Reproducibility/revision.txt` records a clean detached checkout of
    the tested source revision.
-2. `Evidence/Reproducibility/restore-build-publish.log` records restore, Release
-   build, and publish from that checkout.
+2. `Evidence/Reproducibility/restore-build-publish.log` records the restore,
+   Release build, and publish operations from that checkout.
 3. `Evidence/Reproducibility/published-assembly.txt` records the published DLL's
    `ProductVersion` and SHA-256 hash.
 4. The Word report names the same tested source revision.
@@ -62,7 +64,8 @@ It uses:
 - Field-level `ValidationMessage` components and `ValidationSummary`.
 - Text inputs without native `required`, `type="email"`, or `pattern`
   constraints.
-- Built-in required, email, string-length, and range validation attributes.
+- Built-in required, email-address, string-length, and range validation
+  attributes.
 - A plain custom `ReservedNameAttribute` with no client rule provider.
 
 The custom attribute is attached to `RegistrationModel.Name`. Browser-supported
@@ -72,13 +75,13 @@ the server, and is rejected during server-side DataAnnotations validation. The
 static SSR response re-renders the same form with its posted values, the Name
 field message, and the validation summary.
 
-`OnInvalidSubmit` also renders a server-rejection alert above the form. This
+`OnInvalidSubmit` also renders a server-rejection alert above the form. The alert
 makes a rejected POST distinct from browser-only feedback and explicitly tells
 the tester to inspect the repopulated Name, Email, and Age controls. Stable
 element IDs identify the rejection alert (`submission-rejected`), the three
 controls (`name`, `email`, and `age`), and the summary (`validation-summary`).
 
-In the tested RC1 build, browser reconciliation places a server-only custom
+In the tested RC1 build, browser-side reconciliation places a server-only custom
 error into field-bound validation containers but leaves the standard
 `ValidationSummary` container hidden. The summary card therefore contains a
 second field-bound Name message. CSS hides that fallback whenever the standard
@@ -104,7 +107,7 @@ direct GET cannot fabricate a confirmation.
 
 - Git
 - .NET SDK `11.0.100-rc.1.26425.128`
-- Microsoft Edge or another supported browser
+- Microsoft Edge or another browser supported by the application
 
 The required SDK is pinned by `global.json`.
 
@@ -113,7 +116,7 @@ The required SDK is pinned by `global.json`.
 ```powershell
 git clone https://github.com/Vinoth2562000/BlazorStaticSSRFormValidation.git
 Set-Location .\BlazorStaticSSRFormValidation
-git checkout a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8
+git checkout --detach a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8
 git status --short
 git rev-parse HEAD
 dotnet --info
@@ -134,14 +137,19 @@ Open `http://localhost:5143/registration`.
 
 ## Published execution
 
-Use a clean output directory so no files from an earlier revision remain.
+Use a clean output directory so that no files from an earlier revision remain.
 
 ```powershell
+$publishDirectory = Join-Path $PWD 'artifacts\publish'
+if (Test-Path $publishDirectory) {
+  Remove-Item $publishDirectory -Recurse -Force
+}
+
 dotnet publish .\StaticSSRFormValidation\StaticSSRFormValidation.csproj `
   --configuration Release `
-  --output .\artifacts\publish
+  --output $publishDirectory
 
-Set-Location .\artifacts\publish
+Set-Location $publishDirectory
 .\StaticSSRFormValidation.exe --urls http://localhost:5144
 ```
 
@@ -159,11 +167,11 @@ Keep the browser developer tools Network panel open and preserve the log.
 3. Verify that no validation message appears while initially typing.
 4. Move focus out of Email.
 5. Verify the email message and invalid styling appear without a POST.
-6. Without leaving Email again, change the value to `user@example.com`.
+6. Focus Email again and change the value to `user@example.com`.
 7. Verify the message and invalid styling clear without a POST.
 
-Expected result: `Pass` only if feedback first appears on change or blur and
-then clears on input after the first error.
+Expected result: `Pass` only if feedback first appears after Email loses focus
+and then clears while correcting the value after the first error.
 
 ### 2. Built-in invalid submission is blocked
 
@@ -173,8 +181,8 @@ then clears on input after the first error.
 4. Verify no POST appears in the Network panel.
 5. Verify no success confirmation appears.
 
-Expected result: `Pass` only if browser-supported validation blocks the POST.
-An empty-form submission must not be documented as an expected HTTP 400.
+Expected result: `Pass` only if browser-supported validation blocks the POST. Do
+not document an empty-form submission as an expected HTTP 400 response.
 
 ### 3. Successful server POST
 
@@ -189,7 +197,7 @@ An empty-form submission must not be documented as an expected HTTP 400.
 8. Verify the confirmation is still absent.
 
 Expected result: `Pass` only if the confirmation follows a successful POST and
-cannot be created by direct GET navigation or query-string manipulation.
+cannot be produced by direct GET navigation or query-string manipulation.
 
 ### 4. Server-only reserved-name rejection
 
@@ -211,12 +219,13 @@ form's validation state.
 
 ### 5. Published application
 
-Repeat paths 1 through 4 against the published URL. The aggregate published row
-is `Failed` if any required browser-feedback or server-POST outcome fails.
+Repeat paths 1 through 4 against the published URL. Mark the aggregate published
+row as `Failed` if any required browser-feedback or server-POST outcome fails.
 
 ## Evidence checklist
 
-Capture new evidence only after checking out the reported full SHA:
+Capture new evidence only after checking out the reported full SHA in detached
+HEAD mode:
 
 - Clean `git status --short` output.
 - Full `git rev-parse HEAD` output.
@@ -240,16 +249,16 @@ from development or published execution.
 
 | Concern | Required evidence | Current status |
 |---|---|---|
-| Rejected POST preserves the form | Development and published recordings plus HARs showing the POST, HTML response, rejection alert, all three values, field error, summary error, and no success output | Behavior complete; HARs confirm HTTP 200, `text/html`, preserved values, errors, and no success output |
+| Rejected POST preserves the form | Development and published recordings plus HARs showing the POST, HTML response, rejection alert, all three values, field error, summary error, and no success output | Complete for the reserved-name path; HARs confirm HTTP 200, `text/html`, preserved values, errors, and no success output |
 | Direct GET cannot fabricate success | Development and published recordings of `/registration?success=true&name=Anything` with no confirmation | Pending revision-aligned recordings |
 | Correct source revision | Full SHA in the report, README, clean-checkout log, and published assembly | Complete: `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8` |
 | Published aggregate | All four mandatory paths repeated against published execution | Pending complete revision-aligned recordings |
 | Clean build reproducibility | Clean checkout, restore, Release build, publish, and startup logs | Complete under `Evidence/Reproducibility/` |
 | Environment and execution modes | Exact versions plus Development/Published labels for every recording | Environment log complete; report details and recording labels pending |
 
-## Environment used for the correction
+## Evidence-capture environment
 
-These values were captured during the clean revision-aligned build and are also
+These values were captured during the clean, revision-aligned build and are also
 recorded in `Evidence/Reproducibility/environment.txt`.
 
 | Item | Value |
