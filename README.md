@@ -9,16 +9,21 @@ browser feedback and server validation in a static SSR form on .NET 11 RC1.
 The application was corrected after review feedback identified that the previous
 API-style POST navigated to a raw HTTP 400 response. The published files and
 reproducibility logs were regenerated from the clean test revision identified
-below. Recordings must be captured from that revision before the report can claim
-`Outcome: Works`.
+below. Development and published reserved-name evidence now demonstrate an HTTP
+200 form response with all three submitted values preserved, field and summary
+errors, no success confirmation, and no raw JSON response.
 
-Before resubmitting the report:
+The report must not claim `Outcome: Works` until the remaining evidence gaps are
+closed:
 
-1. Use test revision `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`.
-2. Build, publish, and run from a clean checkout of that exact revision.
-3. Use only recordings captured from that revision.
-4. Commit the regenerated published output and reproducibility logs.
-5. Ensure the report uses the same full SHA and environment details.
+1. Capture development and published negative tests proving that direct
+   navigation to `/registration?success=true&name=Anything` shows no
+   confirmation.
+2. Repeat every mandatory published path using output built from test revision
+   `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`.
+3. Label every recording as Development or Published and list the exact evidence
+   filenames in the report.
+4. Replace the report's generic environment names with the exact versions below.
 
 ### Revision identity chain
 
@@ -26,10 +31,10 @@ The tested application source revision is
 `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8`. The report, clean-checkout log,
 and published assembly `ProductVersion` must all identify that SHA.
 
-Later commits may add recordings, HAR files, logs, the Word report, and published
+Later commits add recordings, HAR files, logs, the Word report, and published
 artifacts to the repository. Those evidence-packaging commits become GitHub
-`HEAD`, but they aren't a different tested application revision. Reviewers
-should verify the chain as follows:
+`HEAD`, but they don't represent a different tested application revision.
+Reviewers should verify the chain as follows:
 
 1. `Evidence/Reproducibility/revision.txt` records a clean detached checkout of
    the tested source revision.
@@ -41,8 +46,10 @@ should verify the chain as follows:
 5. A later GitHub `HEAD` is expected only when its changes package evidence and
    don't alter the tested application source.
 
-Do not mark the overall or published-output outcome as `Works` until every
-mandatory path below passes in both development and published execution.
+The current GitHub `HEAD` is therefore expected to differ from the tested source
+SHA. Do not mark the overall or published-output outcome as `Works` until every
+mandatory path below passes in both development and published execution and the
+report identifies the corresponding evidence.
 
 ## Implementation
 
@@ -233,17 +240,17 @@ from development or published execution.
 
 | Concern | Required evidence | Current status |
 |---|---|---|
-| Rejected POST preserves the form | Continuous development and published recordings showing the POST, rejection alert, all three values, field error, summary error, and no success output | Pending revision-aligned recordings |
+| Rejected POST preserves the form | Development and published recordings plus HARs showing the POST, HTML response, rejection alert, all three values, field error, summary error, and no success output | Behavior complete; HARs confirm HTTP 200, `text/html`, preserved values, errors, and no success output |
 | Direct GET cannot fabricate success | Development and published recordings of `/registration?success=true&name=Anything` with no confirmation | Pending revision-aligned recordings |
-| Correct source revision | Full SHA in the report, README, clean-checkout log, and published assembly | Complete |
+| Correct source revision | Full SHA in the report, README, clean-checkout log, and published assembly | Complete: `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8` |
 | Published aggregate | All four mandatory paths repeated against published execution | Pending complete revision-aligned recordings |
 | Clean build reproducibility | Clean checkout, restore, Release build, publish, and startup logs | Complete under `Evidence/Reproducibility/` |
-| Environment and execution modes | Exact versions plus Development/Published labels for every recording | Environment complete; recording labels pending |
+| Environment and execution modes | Exact versions plus Development/Published labels for every recording | Environment log complete; report details and recording labels pending |
 
 ## Environment used for the correction
 
-These values describe the machine used to implement and locally verify the
-correction. Record the actual values again when capturing final evidence.
+These values were captured during the clean revision-aligned build and are also
+recorded in `Evidence/Reproducibility/environment.txt`.
 
 | Item | Value |
 |---|---|
@@ -255,7 +262,7 @@ correction. Record the actual values again when capturing final evidence.
 | Visual Studio | 18.10.3 |
 | Branch | `main` |
 | Previous failed baseline | `68f52c217d36dc43ddfdea0fc38f3bed7f07c2d7` |
-| Corrected test commit | `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8` |
+| Tested source commit | `a1056aca8375b6d1ccda40c69fcf2f4bc724f2c8` |
 
 ## Project layout
 
@@ -266,6 +273,9 @@ StaticSSRFormValidation/
   Program.cs
   StaticSSRFormValidation.csproj
 Evidence/
+  Browser Feedback and Server-Side Validation in Static SSR Forms.docx
+  Development-ReservedName-POST.har
+  Published-ReservedName-POST.har
   Reproducibility/
   Static SSR/
   published-app/
